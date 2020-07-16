@@ -35,6 +35,7 @@ const optionLength1 = function (option) {
       numberOfLines = input[1].slice(1);
       printOption = input[1].slice(0, 1);
     }
+    if (fs.existsSync(input[1])) printError();
   }
 
   if (input[1].length == 1) {
@@ -42,6 +43,7 @@ const optionLength1 = function (option) {
       numberOfLines = input[2];
       printOption = input[1];
     }
+    if (fs.existsSync(input[2])) printError();
   }
 };
 
@@ -74,6 +76,7 @@ const findFiles = function (input, option) {
 };
 
 const openFile = function (fileName) {
+  if (!fs.existsSync(fileName)) printError();
   return fs.readFileSync(fileName, "utf-8");
 };
 
@@ -106,6 +109,10 @@ const requirement = function (input, option) {
   else findFiles(input, option);
 
   printData(fileNameArray, numberOfLines, printOption);
+};
+
+const printError = function () {
+  console.log("There is a error in input!!!");
 };
 
 module.exports = requirement;
