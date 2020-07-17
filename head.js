@@ -18,6 +18,8 @@ const main = function (input, fs) {
 const printData = function (fileNameArray, count, printOption, fs) {
   for (let i = 0; i < fileNameArray.length; i++) {
     let fileContents = openFile(fileNameArray[i], fs);
+    console.log(headerOfFile(fileNameArray[i]));
+
     printOption == "n"
       ? printLines(fileContents, count)
       : printBytes(fileContents, count);
@@ -29,18 +31,22 @@ const openFile = function (fileName, fs) {
   return fs.readFileSync(fileName, "utf-8");
 };
 
+const headerOfFile = function (file) {
+  return "====>" + file + "<====";
+};
+
 const printLines = function (fileContents, count) {
   let line = fileContents.split("\n");
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < count && i < line.length; i++) {
     console.log(line[i]);
   }
-  console.log("=============================");
+  console.log("\n");
 };
 
 const printBytes = function (fileContents, count) {
   let content = fileContents.slice(0, count);
   console.log(content);
-  console.log("==============================");
+  console.log("\n");
 };
 
 const errorMAssage = function () {
