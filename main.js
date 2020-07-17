@@ -1,6 +1,6 @@
-const main = require("./head.js");
+const head = require("./libs.js");
 
 const fs = require("fs");
 const input = process.argv.slice(2);
 
-main(input, fs);
+head(input, fs);

@@ -1,49 +1,34 @@
 // const errorMassage = require("./new.js");
 
-const extractValues = function (input, fs) {
+const extractOptions = function (input, fs) {
   inputValues = {};
 
   let option = input.find((element) => element.startsWith("-"));
 
-  if (!option) inputValues = inputHasOnlyFiles(input, fs);
-  if (option && option.length > 0) inputValues = allOptions(input, fs, option);
+  if (!option) inputValues = getOptionsOnlyForFiles(input, fs);
+  if (option && option.length > 0)
+    inputValues = getAllOptions(input, fs, option);
 
   return inputValues;
 };
 
-const inputHasOnlyFiles = function (input, fs) {
-  let inputValues = {};
-  let fileNameArray = [];
-  for (let i = input.length - 1; i >= 0; i--) {
-    if (fs.existsSync(input[i])) fileNameArray.unshift(input[i]);
-  }
-  let count = 10;
-  let printOption = "n";
-
-  inputValues.fileNameArray = fileNameArray;
-  inputValues.count = count;
-  inputValues.printOption = printOption;
-
-  return inputValues;
+const getOptionsOnlyForFiles = function (input, fs) {
+  return { fileNameArray: input, count: 10, printOption: "n" };
 };
 
-const allOptions = function (input, fs, option) {
-  if (option && option.length == 2)
-    inputValues = hyphenWithCharacter(input, fs, option);
+const getAllOptions = function (input, fs, option) {
+  if (option.length == 1) return getOptionsForHyphenOnly(input, fs, option);
 
-  if (option && option.length > 2)
-    inputValues = hyphenWithCharAndNum(input, fs, option);
+  if (option.length == 2) return getOptionsForCharOnly(input, fs, option);
 
-  if (option && option.length == 1) inputValues = onlyHyphen(input, fs, option);
-
-  return inputValues;
+  return getOptionsForCharAndNum(input, fs, option);
 };
 
-const hyphenWithCharAndNum = function (input, fs, option) {
+const getOptionsForCharAndNum = function (input, fs, option) {
   let inputValues = {};
   inputValues.count = option.slice(1);
   inputValues.printOption = "n";
-  if (option[1] == "n" || option[1] == "c") {
+  if (isValidOption(option[1])) {
     inputValues.count = option.slice(2);
     inputValues.printOption = option[1];
   }
@@ -52,27 +37,27 @@ const hyphenWithCharAndNum = function (input, fs, option) {
   return inputValues;
 };
 
-const hyphenWithCharacter = function (input, fs, option) {
-  let inputValues = {};
-  if (option[1].startsWith("c") || option[1].startsWith("n")) {
-    inputValues.printOption = option[1];
-    inputValues.count = input[1];
-    inputValues.fileNameArray = input.slice(2);
-  } else {
-    inputValues.printOption = "n";
-    inputValues.count = option.slice(1);
-    inputValues.fileNameArray = input.slice(1);
+const getOptionsForCharOnly = function (input, fs, option) {
+  if (isValidOption(option[1])) {
+    return {
+      printOption: option[1],
+      count: input[1],
+      fileNameArray: input.slice(2),
+    };
   }
-
-  return inputValues;
+  return {
+    printOption: "n",
+    count: option.slice(1),
+    fileNameArray: input.slice(1),
+  };
 };
 
-const onlyHyphen = function (input, fs, option) {
+const getOptionsForHyphenOnly = function (input, fs, option) {
   let inputValues = {};
   inputValues.count = input[1];
   inputValues.printOption = "n";
   if (input[1].length > 1) {
-    if (input[1].startsWith("n") || input[1].startsWith("c")) {
+    if (isValidOption(input[1])) {
       inputValues.count = input[1].slice(1);
       inputValues.printOption = input[1].slice(0, 1);
     }
@@ -81,13 +66,12 @@ const onlyHyphen = function (input, fs, option) {
   }
 
   if (input[1].length == 1) {
-    if (input[1].startsWith("c") || input[1].startsWith("n")) {
+    if (isValidOption(input[1])) {
       inputValues.count = input[2];
       inputValues.printOption = input[1];
       inputValues.fileNameArray = input.slice(3);
-    }
-    else{
-        inputValues.count = input[1];
+    } else {
+      inputValues.count = input[1];
       inputValues.printOption = "n";
       inputValues.fileNameArray = input.slice(2);
     }
@@ -96,4 +80,5 @@ const onlyHyphen = function (input, fs, option) {
   return inputValues;
 };
 
-module.exports = extractValues;
+const isValidOption = (char) => char == "c" || char == "n";
+module.exports = extractOptions;
